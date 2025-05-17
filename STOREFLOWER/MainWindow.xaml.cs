@@ -51,7 +51,8 @@ namespace STOREFLOWER
 
                 if (admin != null)
                 {
-                    AdminWindow adminWindow = new AdminWindow();
+                    // Передаем объект admin в AdminWindow
+                    AdminWindow adminWindow = new AdminWindow(admin);
                     adminWindow.Show();
                     this.Close();
                 }

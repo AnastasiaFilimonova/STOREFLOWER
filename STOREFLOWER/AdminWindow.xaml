@@ -14,9 +14,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,5">
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,10">
             <TextBlock Text="Адрес магазина:" FontWeight="Bold" FontSize="16"/>
-            <TextBlock Text="ФИО пользователя:" FontWeight="Bold" FontSize="16" Margin="0,10,0,0"/>
+            <TextBlock x:Name="StoreAddressTextBlock" FontSize="16" Margin="0,2,0,10"/>
+            <TextBlock Text="ФИО пользователя:" FontWeight="Bold" FontSize="16"/>
+            <TextBlock x:Name="AdminNameTextBlock" FontSize="16"/>
         </StackPanel>
         <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
@@ -24,44 +26,44 @@
                 <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Активные заказы" FontSize="18" VerticalAlignment="Center"/>
-            <ComboBox Width="200" FontSize="16" HorizontalAlignment="Right" Grid.Column="1">
-                <ComboBoxItem Content="Все"/>
+            <ComboBox x:Name="StatusFilterComboBox" Width="200" FontSize="16" HorizontalAlignment="Right" Grid.Column="1" SelectionChanged="StatusFilterComboBox_SelectionChanged">
+                <ComboBoxItem Content="Все" IsSelected="True"/>
                 <ComboBoxItem Content="Ожидают оплаты"/>
                 <ComboBoxItem Content="Оплачены"/>
             </ComboBox>
         </Grid>
         <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Заказ" Binding="{Binding OrderNumber}" Width="*" />
-                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*" />
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*" />
-                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*" />
-                <DataGridTextColumn Header="Флорист" Binding="{Binding Florist}" Width="*" />
-                <DataGridTemplateColumn Header="Назначить флориста" Width="180">
+                <DataGridTextColumn Header="Заказ" Binding="{Binding OrderNumber}" Width="80"/>
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*"/>
+                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*"/>
+                <DataGridTextColumn Header="Телефон клиента" Binding="{Binding ClientPhone}" Width="*"/>
+                <DataGridTemplateColumn Header="Флорист" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox Width="160" Height="30" ItemsSource="{Binding AvailableFlorists}" SelectedItem="{Binding SelectedFlorist, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                            <ComboBox Width="250" Height="30" ItemsSource="{Binding AvailableFlorists}" SelectedValue="{Binding FloristId, Mode=TwoWay}" SelectedValuePath="Id" DisplayMemberPath="FullName" IsEditable="True"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <GroupBox Header="Флористы" Grid.Row="3" Margin="0,10,0,0" Padding="10" Height="180">
-            <ListView x:Name="FloristListView" FontSize="16" BorderThickness="0" Background="White">
-                <ListView.ItemTemplate>
+        <GroupBox Header="Флористы" Grid.Row="3" Margin="0,10,0,0" Padding="5" Height="180">
+            <ListBox x:Name="FloristListBox" FontSize="16" BorderThickness="0" Background="White">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="#DDDDDD" BorderThickness="1" Padding="10" Margin="0,0,0,10" CornerRadius="8" Background="White">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="18"/>
-                                <TextBlock Text="{Binding Phone}" Margin="0,5,0,0"/>
-                                <TextBlock Text="{Binding Address}" Foreground="Gray"/>
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="16" Width="300"/>
+                            <TextBlock Text="{Binding Phone}" Margin="10,0,0,0" Width="150"/>
+                            <TextBlock Text="{Binding Address}" Foreground="Gray" Margin="10,0,0,0"/>
+                        </StackPanel>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </GroupBox>
-        <Button Grid.Row="4" Content="Создать заказ" Height="35" Width="160" FontSize="16" HorizontalAlignment="Left" Margin="0,10,0,0"/>
-        <Button Content="Выход" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Margin="790,10,10,0" Grid.Row="4"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,10,0,0">
+            <Button x:Name="CreateOrderButton" Content="Создать заказ" Height="35" Width="160" FontSize="16" Margin="0,0,10,0" Click="CreateOrderButton_Click"/>
+            <Button x:Name="ExitButton" Content="Выход" Height="35" Width="100" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Click="ExitButton_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

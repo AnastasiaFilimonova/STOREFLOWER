@@ -15,7 +15,7 @@ namespace STOREFLOWER.Models
         public int StoreID { get; set; }
         public DateTime DeliveryDateTime { get; set; }
         public int StatusID { get; set; }
-        public int FloristID { get; set; }
+        public int? FloristID { get; set; }
         public int DelivererID { get; set; }
         public string ClientLastName { get; set; }
         public string ClientFirstName { get; set; }

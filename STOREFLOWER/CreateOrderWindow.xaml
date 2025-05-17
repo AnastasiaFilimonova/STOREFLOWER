@@ -31,7 +31,7 @@
         </ScrollViewer>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
             <Button Content="Отмена" Width="100" Height="35" Margin="0,0,10,0" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White"/>
-            <Button Content="Создать заказ" Width="130" Height="35" FontSize="16"/>
+            <Button Content="Создать заказ" Width="130" Height="35" FontSize="16" Click="CreateOrderButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
