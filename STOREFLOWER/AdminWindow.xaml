@@ -65,4 +65,3 @@
         <Button Content="Выход" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Margin="790,10,10,0" Grid.Row="4"/>
     </Grid>
 </Window>
-
