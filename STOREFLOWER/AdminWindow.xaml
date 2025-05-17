@@ -1,0 +1,68 @@
+﻿<Window x:Class="STOREFLOWER.AdminWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:STOREFLOWER"
+        mc:Ignorable="d"
+        Title="AdminWindow" Height="700" Width="920" MinHeight="700" MinWidth="920" Background="{StaticResource BackgroundBrush}">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,5">
+            <TextBlock Text="Адрес магазина:" FontWeight="Bold" FontSize="16"/>
+            <TextBlock Text="ФИО пользователя:" FontWeight="Bold" FontSize="16" Margin="0,10,0,0"/>
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Активные заказы" FontSize="18" VerticalAlignment="Center"/>
+            <ComboBox Width="200" FontSize="16" HorizontalAlignment="Right" Grid.Column="1">
+                <ComboBoxItem Content="Все"/>
+                <ComboBoxItem Content="Ожидают оплаты"/>
+                <ComboBoxItem Content="Оплачены"/>
+            </ComboBox>
+        </Grid>
+        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Заказ" Binding="{Binding OrderNumber}" Width="*" />
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*" />
+                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*" />
+                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*" />
+                <DataGridTextColumn Header="Флорист" Binding="{Binding Florist}" Width="*" />
+                <DataGridTemplateColumn Header="Назначить флориста" Width="180">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox Width="160" Height="30" ItemsSource="{Binding AvailableFlorists}" SelectedItem="{Binding SelectedFlorist, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <GroupBox Header="Флористы" Grid.Row="3" Margin="0,10,0,0" Padding="10" Height="180">
+            <ListView x:Name="FloristListView" FontSize="16" BorderThickness="0" Background="White">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#DDDDDD" BorderThickness="1" Padding="10" Margin="0,0,0,10" CornerRadius="8" Background="White">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock Text="{Binding Phone}" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding Address}" Foreground="Gray"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </GroupBox>
+        <Button Grid.Row="4" Content="Создать заказ" Height="35" Width="160" FontSize="16" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+        <Button Content="Выход" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Margin="790,10,10,0" Grid.Row="4"/>
+    </Grid>
+</Window>
+

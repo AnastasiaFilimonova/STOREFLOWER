@@ -1,0 +1,17 @@
+﻿<Window x:Class="STOREFLOWER.DeliveryDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:STOREFLOWER"
+        mc:Ignorable="d"
+        Title="DeliveryDetailsWindow" Height="300" Width="400">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="Адрес клиента:" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+            <TextBlock x:Name="ClientAddressText" FontSize="14" TextWrapping="Wrap" />
+            <TextBlock Text="Адрес магазина:" FontWeight="Bold" FontSize="16"/>
+            <TextBlock x:Name="ShopAddressText" FontSize="14" TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
+</Window>
