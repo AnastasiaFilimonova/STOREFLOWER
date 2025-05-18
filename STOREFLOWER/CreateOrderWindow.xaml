@@ -21,16 +21,33 @@
                 <TextBox x:Name="CustomerPhoneTextBox" FontSize="16" Height="30" Margin="0,0,0,10"/>
                 <TextBlock Text="Адрес доставки:" FontSize="16"/>
                 <TextBox x:Name="DeliveryAddressTextBox" FontSize="16" Height="30" Margin="0,0,0,10"/>
-                <TextBlock Text="Адрес магазина:" FontSize="16"/>
-                <TextBox x:Name="StoreAddressComboBox" FontSize="16" Height="30" Margin="0,0,0,10"/>
+                <TextBlock Text="Магазин:" FontSize="16"/>
+                <ComboBox x:Name="StoreAddressComboBox" FontSize="16" Height="30" Margin="0,0,0,10" DisplayMemberPath="Address" SelectedValuePath="StoreID"/>
                 <TextBlock Text="Время доставки:" FontSize="16"/>
                 <DatePicker x:Name="DeliveryDatePicker" FontSize="16" Height="30" Margin="0,0,0,10"/>
-                <TextBlock Text="Описание заказа:" FontSize="16"/>
-                <TextBox x:Name="OrderDescriptionTextBox" Height="80" TextWrapping="Wrap" AcceptsReturn="True" FontSize="16" Margin="0,0,0,10"/>
+                <TextBlock Text="Состав заказа:" FontSize="16" FontWeight="Bold" Margin="0,20,0,5"/>
+                <ListBox x:Name="OrderItemsListBox" Height="200" Margin="0,0,0,10">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox x:Name="ProductComboBox" Width="200" FontSize="16" 
+                                          ItemsSource="{Binding AvailableProducts}" 
+                                          DisplayMemberPath="ProductName" 
+                                          SelectedValuePath="ProductID" 
+                                          SelectedValue="{Binding ProductID, Mode=TwoWay}" 
+                                          SelectionChanged="ProductComboBox_SelectionChanged"/>
+                                <TextBox x:Name="QuantityTextBox" Width="100" FontSize="16" Margin="10,0,0,0" 
+                                         Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Button Content="Удалить" Width="100" FontSize="16" Margin="10,0,0,0" Click="RemoveOrderItemButton_Click"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="Добавить продукт" Width="150" Height="30" FontSize="16" Click="AddOrderItemButton_Click" Margin="0,0,0,10"/>
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-            <Button Content="Отмена" Width="100" Height="35" Margin="0,0,10,0" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White"/>
+            <Button Content="Отмена" Width="100" Height="35" Margin="0,0,10,0" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Click="CancelButton_Click"/>
             <Button Content="Создать заказ" Width="130" Height="35" FontSize="16" Click="CreateOrderButton_Click"/>
         </StackPanel>
     </Grid>

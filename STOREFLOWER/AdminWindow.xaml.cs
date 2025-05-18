@@ -69,7 +69,18 @@ namespace STOREFLOWER
             var orders = _context.Orders
                 .Include(o => o.Status)
                 .Include(o => o.Florist)
+                .Include(o => o.Deliverer)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
                 .Where(o => o.StoreID == _currentAdmin.StoreID)
+                .ToList();
+
+            var availableStatuses = _context.OrderStatuses
+                .Select(s => new OrderStatusViewModel
+                {
+                    Id = s.StatusID,
+                    Name = s.StatusName
+                })
                 .ToList();
 
             _allOrders = orders
@@ -78,25 +89,37 @@ namespace STOREFLOWER
                 {
                     OrderNumber = o.OrderID.ToString(),
                     CreationDate = o.OrderDate.ToString("dd.MM.yyyy"),
+                    DeliveryAddress = o.DeliveryAddress,
+                    DeliveryDateTime = o.DeliveryDateTime,
                     Status = o.Status?.StatusName ?? "Не указан",
                     StatusID = o.StatusID,
                     Customer = $"{o.ClientLastName} {o.ClientFirstName} {o.ClientPatronymic}",
-                    ClientPhone = o.ClientPhoneNumber, // Добавлен номер телефона клиента
+                    ClientPhone = o.ClientPhoneNumber,
                     FloristDisplay = o.Florist != null ? $"{o.Florist.LastName} {o.Florist.FirstName} {o.Florist.Patronymic}" : "Не назначен",
+                    DelivererDisplay = o.Deliverer != null ? $"{o.Deliverer.LastName} {o.Deliverer.FirstName} {o.Deliverer.Patronymic}" : "Не назначен",
                     FloristId = o.Florist?.FloristID ?? 0,
-                    AvailableFlorists = _context.Florists
+                    AvailableFlorists = new List<FloristViewModel>
+                    {
+                        new FloristViewModel { FullName = "Не назначен", Id = 0 }
+                    }.Concat(_context.Florists
                         .Where(f => f.StoreID == _currentAdmin.StoreID)
                         .Select(f => new FloristViewModel
                         {
                             FullName = $"{f.LastName} {f.FirstName} {f.Patronymic}",
                             Id = f.FloristID
-                        })
-                        .ToList()
+                        }))
+                        .ToList(),
+                    AvailableStatuses = availableStatuses,
+                    OrderItems = o.OrderItems?.Select(oi => new OrderItemViewModel
+                    {
+                        ProductName = oi.Product?.ProductName ?? "Не указан",
+                        Quantity = oi.Quantity,
+                        Price = oi.Price
+                    }).ToList() ?? new List<OrderItemViewModel>()
                 })
                 .ToList();
 
             OrdersGrid.ItemsSource = _allOrders;
-            OrdersGrid.CellEditEnding += OrdersGrid_CellEditEnding;
         }
 
         private void StatusFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -125,46 +148,72 @@ namespace STOREFLOWER
             }
         }
 
-        private void OrdersGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        private void OrderNumberHyperlink_Click(object sender, RoutedEventArgs e)
         {
-            if (e.Column.Header.ToString() == "Флорист")
-            {
-                var order = e.Row.DataContext as OrderViewModel;
-                if (order != null)
-                {
-                    var comboBox = e.EditingElement as ComboBox;
-                    if (comboBox != null)
-                    {
-                        var selectedFlorist = comboBox.SelectedItem as FloristViewModel;
-                        if (selectedFlorist != null)
-                        {
-                            order.FloristDisplay = selectedFlorist.FullName;
-                            order.FloristId = selectedFlorist.Id;
+            var hyperlink = sender as Hyperlink;
+            if (hyperlink == null) return;
 
-                            // Обновляем заказ в базе данных
-                            var dbOrder = _context.Orders.FirstOrDefault(o => o.OrderID == int.Parse(order.OrderNumber));
-                            if (dbOrder != null)
+            var order = hyperlink.DataContext as OrderViewModel;
+            if (order == null) return;
+
+            var detailsWindow = new OrderDetailsWindow(order);
+            detailsWindow.ShowDialog();
+        }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                foreach (var order in _allOrders)
+                {
+                    var dbOrder = _context.Orders.FirstOrDefault(o => o.OrderID == int.Parse(order.OrderNumber));
+                    if (dbOrder != null)
+                    {
+                        if (dbOrder.StatusID != order.StatusID)
+                        {
+                            dbOrder.StatusID = order.StatusID;
+                            order.Status = _context.OrderStatuses
+                                .Where(s => s.StatusID == order.StatusID)
+                                .Select(s => s.StatusName)
+                                .FirstOrDefault() ?? "Не указан";
+                        }
+
+                        if (order.FloristId != 0)
+                        {
+                            if (dbOrder.FloristID != order.FloristId)
                             {
-                                dbOrder.FloristID = selectedFlorist.Id;
-                                _context.SaveChanges();
+                                dbOrder.FloristID = order.FloristId;
+                                order.FloristDisplay = _context.Florists
+                                    .Where(f => f.FloristID == order.FloristId)
+                                    .Select(f => $"{f.LastName} {f.FirstName} {f.Patronymic}")
+                                    .FirstOrDefault() ?? "Не назначен";
                             }
                         }
                         else
                         {
-                            // Если флорист не выбран (например, сброшен), сбрасываем назначение
-                            order.FloristDisplay = "Не назначен";
-                            order.FloristId = 0;
-
-                            var dbOrder = _context.Orders.FirstOrDefault(o => o.OrderID == int.Parse(order.OrderNumber));
-                            if (dbOrder != null)
+                            if (dbOrder.FloristID != null)
                             {
                                 dbOrder.FloristID = null;
-                                _context.SaveChanges();
+                                order.FloristDisplay = "Не назначен";
                             }
                         }
                     }
                 }
+
+                _context.SaveChanges();
+                MessageBox.Show("Данные успешно обновлены!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при обновлении данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void CreateOrderButton_Click(object sender, RoutedEventArgs e)
+        {
+            CreateOrderWindow createOrderWindow = new CreateOrderWindow(_currentAdmin);
+            createOrderWindow.Show();
+            this.Close();
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
@@ -172,11 +221,84 @@ namespace STOREFLOWER
             this.Close();
         }
 
-        private void CreateOrderButton_Click(object sender, RoutedEventArgs e)
+        private void StatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            CreateOrderWindow createOrderWindow = new CreateOrderWindow();
-            createOrderWindow.Show();
-            this.Close();
+            if (sender is ComboBox comboBox && comboBox.DataContext is OrderViewModel order)
+            {
+                var selectedStatus = comboBox.SelectedValue as OrderStatusViewModel;
+                if (selectedStatus != null && order.StatusID != selectedStatus.Id)
+                {
+                    order.StatusID = selectedStatus.Id;
+                    order.Status = selectedStatus.Name;
+
+                    // Обновляем объект в базе данных с отладкой
+                    if (int.TryParse(order.OrderNumber, out int orderId))
+                    {
+                        var dbOrder = _context.Orders.FirstOrDefault(o => o.OrderID == orderId);
+                        if (dbOrder != null)
+                        {
+                            dbOrder.StatusID = order.StatusID;
+                            try
+                            {
+                                _context.SaveChanges();
+                                MessageBox.Show($"Статус заказа {order.OrderNumber} успешно обновлён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка при сохранении статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Заказ с номером {order.OrderNumber} не найден в базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Неверный формат номера заказа: {order.OrderNumber}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private void FloristComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is OrderViewModel order)
+            {
+                var selectedFlorist = comboBox.SelectedValue as FloristViewModel;
+                if (selectedFlorist != null && order.FloristId != selectedFlorist.Id)
+                {
+                    order.FloristId = selectedFlorist.Id;
+                    order.FloristDisplay = selectedFlorist.Id == 0 ? "Не назначен" : selectedFlorist.FullName;
+
+                    // Обновляем объект в базе данных с отладкой
+                    if (int.TryParse(order.OrderNumber, out int orderId))
+                    {
+                        var dbOrder = _context.Orders.FirstOrDefault(o => o.OrderID == orderId);
+                        if (dbOrder != null)
+                        {
+                            dbOrder.FloristID = selectedFlorist.Id == 0 ? (int?)null : selectedFlorist.Id;
+                            try
+                            {
+                                _context.SaveChanges();
+                                MessageBox.Show($"Флорист для заказа {order.OrderNumber} успешно обновлён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка при сохранении флориста: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Заказ с номером {order.OrderNumber} не найден в базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Неверный формат номера заказа: {order.OrderNumber}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
         }
     }
 
@@ -184,21 +306,33 @@ namespace STOREFLOWER
     {
         public string OrderNumber { get; set; }
         public string CreationDate { get; set; }
+        public string DeliveryAddress { get; set; }
+        public DateTime DeliveryDateTime { get; set; }
         public string Status { get; set; }
         public int StatusID { get; set; }
         public string Customer { get; set; }
-        public string ClientPhone { get; set; } // Добавлен номер телефона клиента
+        public string ClientPhone { get; set; }
         public string FloristDisplay { get; set; }
+        public string DelivererDisplay { get; set; }
         public int FloristId { get; set; }
         public List<FloristViewModel> AvailableFlorists { get; set; }
+        public List<OrderStatusViewModel> AvailableStatuses { get; set; }
         public FloristViewModel SelectedFlorist { get; set; }
+        public List<OrderItemViewModel> OrderItems { get; set; }
+        public decimal TotalOrderPrice => OrderItems?.Sum(oi => oi.TotalPrice) ?? 0;
     }
 
     public class FloristViewModel
     {
-        public string FullName { get; set; } // Теперь полное имя с отчеством
+        public string FullName { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
         public int Id { get; set; }
+    }
+
+    public class OrderStatusViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -16,5 +16,6 @@ namespace STOREFLOWER.Models
 
         // Навигационное свойство для связи с Stores
         public Store Store { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; }
     }
 }

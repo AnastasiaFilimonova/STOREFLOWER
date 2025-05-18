@@ -32,17 +32,51 @@
                 <ComboBoxItem Content="Оплачены"/>
             </ComboBox>
         </Grid>
-        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="False" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <DataGrid.Resources>
+                <Style TargetType="ComboBox">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="2"/>
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Заказ" Binding="{Binding OrderNumber}" Width="80"/>
-                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*"/>
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*"/>
-                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*"/>
-                <DataGridTextColumn Header="Телефон клиента" Binding="{Binding ClientPhone}" Width="*"/>
-                <DataGridTemplateColumn Header="Флорист" Width="*">
+                <DataGridTemplateColumn Header="Заказ" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox Width="250" Height="30" ItemsSource="{Binding AvailableFlorists}" SelectedValue="{Binding FloristId, Mode=TwoWay}" SelectedValuePath="Id" DisplayMemberPath="FullName" IsEditable="True"/>
+                            <TextBlock>
+                                <Hyperlink NavigateUri="{Binding OrderNumber}" Click="OrderNumberHyperlink_Click">
+                                    <TextBlock Text="{Binding OrderNumber}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Статус" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding AvailableStatuses}" 
+                                      SelectedValue="{Binding StatusID, Mode=TwoWay}" 
+                                      SelectedValuePath="Id" 
+                                      DisplayMemberPath="Name" 
+                                      SelectionChanged="StatusComboBox_SelectionChanged"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Телефон клиента" Binding="{Binding ClientPhone}" Width="*" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Флорист" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding AvailableFlorists}" 
+                      SelectedValue="{Binding FloristId, Mode=TwoWay}" 
+                      SelectedValuePath="Id" 
+                      DisplayMemberPath="FullName" 
+                      MaxDropDownHeight="200" 
+                      SelectionChanged="FloristComboBox_SelectionChanged"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

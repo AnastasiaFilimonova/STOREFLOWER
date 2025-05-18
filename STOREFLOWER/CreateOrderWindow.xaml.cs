@@ -1,6 +1,7 @@
 ﻿using STOREFLOWER.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,77 +21,231 @@ namespace STOREFLOWER
     /// </summary>
     public partial class CreateOrderWindow : Window
     {
-        private StoreFlowerContext _context;
+        private readonly StoreFlowerContext _context;
+        private readonly Admin _currentAdmin;
+        private List<CreateOrderItemViewModel> _orderItems = new List<CreateOrderItemViewModel>();
+        private List<Product> _availableProducts;
 
-        public CreateOrderWindow()
+        public CreateOrderWindow(Admin admin)
         {
             InitializeComponent();
             _context = new StoreFlowerContext();
+            _currentAdmin = admin;
+
+            // Загрузка магазинов и продуктов
+            LoadStores();
+            LoadProducts();
+
+            // Установка начального магазина
+            StoreAddressComboBox.SelectedValue = _currentAdmin.StoreID;
+        }
+
+        private void LoadStores()
+        {
+            var stores = _context.Stores.ToList();
+            StoreAddressComboBox.ItemsSource = stores;
+        }
+
+        private void LoadProducts()
+        {
+            _availableProducts = _context.Products
+                .Where(p => p.StoreID == _currentAdmin.StoreID)
+                .ToList();
+            OrderItemsListBox.ItemsSource = _orderItems;
+
+            if (!_availableProducts.Any())
+            {
+                MessageBox.Show("В текущем магазине нет доступных продуктов. Добавьте продукты перед созданием заказа.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void AddOrderItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_availableProducts.Any())
+            {
+                MessageBox.Show("Нет доступных продуктов для добавления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var newItem = new CreateOrderItemViewModel
+            {
+                AvailableProducts = _availableProducts,
+                ProductID = _availableProducts.First().ProductID,
+                Price = _availableProducts.First().Price,
+                Quantity = 1
+            };
+            _orderItems.Add(newItem);
+            OrderItemsListBox.Items.Refresh();
+        }
+
+        private void ProductComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is CreateOrderItemViewModel item)
+            {
+                item.ProductID = (int)(comboBox.SelectedValue ?? 0);
+                item.Price = _availableProducts.FirstOrDefault(p => p.ProductID == item.ProductID)?.Price ?? 0m;
+            }
+        }
+
+        private void RemoveOrderItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is CreateOrderItemViewModel item)
+            {
+                _orderItems.Remove(item);
+                OrderItemsListBox.Items.Refresh();
+            }
         }
 
         private void CreateOrderButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Проверка на пустые поля
+                // Проверка заполнения обязательных полей
                 if (string.IsNullOrWhiteSpace(CustomerNameTextBox.Text) ||
                     string.IsNullOrWhiteSpace(CustomerPhoneTextBox.Text) ||
                     string.IsNullOrWhiteSpace(DeliveryAddressTextBox.Text) ||
-                    StoreAddressComboBox.Text == null ||
+                    StoreAddressComboBox.SelectedValue == null ||
                     DeliveryDatePicker.SelectedDate == null)
                 {
                     MessageBox.Show("Пожалуйста, заполните все поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                // Разделим ФИО
+                // Проверка ФИО
                 var fullName = CustomerNameTextBox.Text.Trim().Split(' ');
                 if (fullName.Length < 3)
                 {
-                    MessageBox.Show("ФИО должно содержать фамилию, имя и отчество.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Введите ФИО полностью (Фамилия Имя Отчество)", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                string lastName = fullName[0];
-                string firstName = fullName[1];
-                string patronymic = fullName[2];
-
-                // Поиск StoreID по адресу магазина (если Store уже есть в БД)
-                int storeId = _context.Stores
-                    .FirstOrDefault(s => s.Address == StoreAddressComboBox.Text)?.StoreID ?? 0;
-
-                if (storeId == 0)
+                // Проверка состава заказа
+                if (!_orderItems.Any())
                 {
-                    MessageBox.Show("Магазин с таким адресом не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Добавьте хотя бы один продукт в состав заказа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                var order = new Order
+                // Проверка корректности количества
+                foreach (var item in _orderItems)
+                {
+                    if (item.Quantity <= 0)
+                    {
+                        MessageBox.Show("Количество каждого продукта должно быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Проверка наличия продукта на складе
+                    var product = _availableProducts.FirstOrDefault(p => p.ProductID == item.ProductID);
+                    if (product != null && product.Stock < item.Quantity)
+                    {
+                        MessageBox.Show($"Недостаточно товара '{product.ProductName}' на складе. Доступно: {product.Stock}.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+
+                // Создание заказа
+                var newOrder = new Order
                 {
                     OrderDate = DateTime.Now,
                     DeliveryAddress = DeliveryAddressTextBox.Text.Trim(),
                     ClientPhoneNumber = CustomerPhoneTextBox.Text.Trim(),
-                    StoreID = storeId,
+                    StoreID = (int)StoreAddressComboBox.SelectedValue,
                     DeliveryDateTime = DeliveryDatePicker.SelectedDate.Value,
-                    StatusID = 1, // Присвоим "новый заказ", если 1 — это статус "новый"
+                    StatusID = 1, // Новый заказ
                     FloristID = null,
-                    DelivererID = 1, // Можно временно задать вручную или через другой выбор
-                    ClientLastName = lastName,
-                    ClientFirstName = firstName,
-                    ClientPatronymic = patronymic
+                    DelivererID = null,
+                    ClientLastName = fullName[0],
+                    ClientFirstName = fullName[1],
+                    ClientPatronymic = fullName[2],
+                    OrderItems = _orderItems.Select(oi => new OrderItem
+                    {
+                        ProductID = oi.ProductID,
+                        Quantity = oi.Quantity,
+                        Price = oi.Price
+                    }).ToList()
                 };
 
-                _context.Orders.Add(order);
+                _context.Orders.Add(newOrder);
+                _context.SaveChanges();
+
+                // Обновляем склад
+                foreach (var item in _orderItems)
+                {
+                    var product = _context.Products.FirstOrDefault(p => p.ProductID == item.ProductID);
+                    if (product != null)
+                    {
+                        product.Stock -= item.Quantity;
+                    }
+                }
                 _context.SaveChanges();
 
                 MessageBox.Show("Заказ успешно создан!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                var adminWindow = new AdminWindow(_currentAdmin);
+                adminWindow.Show();
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при создании заказа:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при создании заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            var adminWindow = new AdminWindow(_currentAdmin);
+            adminWindow.Show();
+            this.Close();
+        }
+    }
+
+    public class CreateOrderItemViewModel : INotifyPropertyChanged
+    {
+        private int _quantity = 1;
+        private int _productID;
+        private decimal _price;
+
+        public List<Product> AvailableProducts { get; set; }
+
+        public int ProductID
+        {
+            get => _productID;
+            set
+            {
+                _productID = value;
+                OnPropertyChanged(nameof(ProductID));
+                OnPropertyChanged(nameof(ProductName));
+            }
+        }
+
+        public int Quantity
+        {
+            get => _quantity;
+            set
+            {
+                _quantity = value;
+                OnPropertyChanged(nameof(Quantity));
+            }
+        }
+
+        public decimal Price
+        {
+            get => _price;
+            set
+            {
+                _price = value;
+                OnPropertyChanged(nameof(Price));
+            }
+        }
+
+        public string ProductName => AvailableProducts?.FirstOrDefault(p => p.ProductID == ProductID)?.ProductName ?? "Не указан";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
-
