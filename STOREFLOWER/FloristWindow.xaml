@@ -14,9 +14,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,5">
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,10">
             <TextBlock Text="Адрес магазина:" FontWeight="Bold" FontSize="16"/>
-            <TextBlock Text="ФИО пользователя:" FontWeight="Bold" FontSize="16" Margin="0,10,0,0"/>
+            <TextBlock x:Name="StoreAddressTextBlock" FontSize="16" Margin="0,2,0,10"/>
+            <TextBlock Text="ФИО пользователя:" FontWeight="Bold" FontSize="16"/>
+            <TextBlock x:Name="FloristNameTextBlock" FontSize="16"/>
         </StackPanel>
         <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
@@ -24,36 +26,53 @@
                 <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Активные заказы" FontSize="18" VerticalAlignment="Center"/>
-            <ComboBox Width="200" FontSize="16" HorizontalAlignment="Right" Grid.Column="1">
-                <ComboBoxItem Content="Все"/>
+            <ComboBox x:Name="StatusFilterComboBox" Width="200" FontSize="16" HorizontalAlignment="Right" Grid.Column="1" SelectionChanged="StatusFilterComboBox_SelectionChanged">
+                <ComboBoxItem Content="Все" IsSelected="True"/>
                 <ComboBoxItem Content="Оплачены"/>
                 <ComboBoxItem Content="Готовы к доставке"/>
             </ComboBox>
         </Grid>
-        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto" CanUserSortColumns="True" Sorting="OrdersGrid_Sorting">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Заказ" Binding="{Binding OrderNumber}" Width="*" />
-                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*" />
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*" />
-                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*" />
+                <DataGridTemplateColumn Header="Заказ" Width="*" SortMemberPath="OrderNumber">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Hyperlink NavigateUri="{Binding OrderNumber}" Click="OrderNumberHyperlink_Click">
+                                    <TextBlock Text="{Binding OrderNumber}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*" SortMemberPath="CreationDate" />
+                <DataGridTemplateColumn Header="Статус" Width="*" SortMemberPath="Status">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Hyperlink Click="StatusHyperlink_Click">
+                                    <TextBlock Text="{Binding Status}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Покупатель" Binding="{Binding Customer}" Width="*" SortMemberPath="Customer" />
             </DataGrid.Columns>
         </DataGrid>
-        <GroupBox Header="Доставщики" Grid.Row="3" Margin="0,10,0,0" Padding="10" Height="180">
-            <ListView x:Name="CourierListView" FontSize="16" BorderThickness="0" Background="White">
-                <ListView.ItemTemplate>
+        <GroupBox Header="Доставщики" Grid.Row="3" Margin="0,10,0,0" Padding="5" Height="180">
+            <ListBox x:Name="CourierListBox" FontSize="16" BorderThickness="0" Background="White">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="#DDDDDD" BorderThickness="1" Padding="10" Margin="0,0,0,10" CornerRadius="8" Background="White">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="18"/>
-                                <TextBlock Text="{Binding Phone}" Margin="0,5,0,0"/>
-                                <TextBlock Text="{Binding Address}" Foreground="Gray"/>
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="{Binding FullName}" FontWeight="Bold" FontSize="16" Width="300"/>
+                            <TextBlock Text="{Binding Phone}" Margin="10,0,0,0" Width="150"/>
+                            <TextBlock Text="{Binding Address}" Foreground="Gray" Margin="10,0,0,0"/>
+                        </StackPanel>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </GroupBox>
-        <Button Content="Выход" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Margin="790,10,10,0" Grid.Row="4"/>
+        <Button x:Name="ExitButton" Content="Выход" FontSize="16" Background="{StaticResource AccentBrush}" Foreground="White" Margin="0,10,0,0" Grid.Row="4" Height="35" Width="100" HorizontalAlignment="Left" Click="ExitButton_Click"/>
     </Grid>
 </Window>
-

@@ -1,0 +1,39 @@
+﻿<Window x:Class="STOREFLOWER.EditOrderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:STOREFLOWER"
+        mc:Ignorable="d"
+        Title="EditOrderWindow" Height="227" Width="420"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Редактировать заказ" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Статус:" FontSize="14" Width="100"/>
+            <ComboBox x:Name="StatusComboBox" Width="200" FontSize="14" 
+                      ItemsSource="{Binding AvailableStatuses}" 
+                      SelectedValue="{Binding StatusID, Mode=TwoWay}" 
+                      SelectedValuePath="Id" 
+                      DisplayMemberPath="Name"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Флорист:" FontSize="14" Width="100"/>
+            <ComboBox x:Name="FloristComboBox" Width="200" FontSize="14" 
+                      ItemsSource="{Binding AvailableFlorists}" 
+                      SelectedValue="{Binding FloristId, Mode=TwoWay}" 
+                      SelectedValuePath="Id" 
+                      DisplayMemberPath="FullName"/>
+        </StackPanel>
+        <Button Grid.Row="4" x:Name="UpdateButton" Content="Обновить" 
+                Width="100" Height="30" FontSize="14" HorizontalAlignment="Right" 
+                Click="UpdateButton_Click"/>
+    </Grid>
+</Window>

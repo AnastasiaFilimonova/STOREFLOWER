@@ -58,7 +58,7 @@ namespace STOREFLOWER
                 }
                 else if (florist != null)
                 {
-                    FloristWindow floristWindow = new FloristWindow();
+                    FloristWindow floristWindow = new FloristWindow(florist);
                     floristWindow.Show();
                     this.Close();
                 }

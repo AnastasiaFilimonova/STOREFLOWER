@@ -32,16 +32,7 @@
                 <ComboBoxItem Content="Оплачены"/>
             </ComboBox>
         </Grid>
-        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="False" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <DataGrid.Resources>
-                <Style TargetType="ComboBox">
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="Height" Value="30"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="Margin" Value="0"/>
-                    <Setter Property="Padding" Value="2"/>
-                </Style>
-            </DataGrid.Resources>
+        <DataGrid x:Name="OrdersGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" FontSize="16" HeadersVisibility="Column" GridLinesVisibility="All" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Заказ" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
@@ -58,11 +49,11 @@
                 <DataGridTemplateColumn Header="Статус" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding AvailableStatuses}" 
-                                      SelectedValue="{Binding StatusID, Mode=TwoWay}" 
-                                      SelectedValuePath="Id" 
-                                      DisplayMemberPath="Name" 
-                                      SelectionChanged="StatusComboBox_SelectionChanged"/>
+                            <TextBlock>
+                                <Hyperlink Click="StatusHyperlink_Click">
+                                    <TextBlock Text="{Binding Status}"/>
+                                </Hyperlink>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -71,12 +62,11 @@
                 <DataGridTemplateColumn Header="Флорист" Width="2*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding AvailableFlorists}" 
-                      SelectedValue="{Binding FloristId, Mode=TwoWay}" 
-                      SelectedValuePath="Id" 
-                      DisplayMemberPath="FullName" 
-                      MaxDropDownHeight="200" 
-                      SelectionChanged="FloristComboBox_SelectionChanged"/>
+                            <TextBlock>
+                                <Hyperlink Click="FloristHyperlink_Click">
+                                    <TextBlock Text="{Binding FloristDisplay}"/>
+                                </Hyperlink>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -101,3 +91,4 @@
         </StackPanel>
     </Grid>
 </Window>
+
