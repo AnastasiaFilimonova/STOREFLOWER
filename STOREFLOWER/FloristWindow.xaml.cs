@@ -25,8 +25,7 @@ namespace STOREFLOWER
         private readonly StoreFlowerContext _context;
         private readonly Florist _currentFlorist;
         private List<OrderViewModel> _allOrders;
-        private ListCollectionView _ordersView; // Для сортировки и фильтрации
-
+        private ListCollectionView _ordersView; 
         public FloristWindow(Florist florist)
         {
             InitializeComponent();
@@ -99,8 +98,6 @@ namespace STOREFLOWER
                     }).ToList() ?? new List<OrderItemViewModel>()
                 })
                 .ToList();
-
-            // Создаём ListCollectionView для поддержки сортировки
             _ordersView = new ListCollectionView(_allOrders);
             OrdersGrid.ItemsSource = _ordersView;
         }
@@ -108,15 +105,11 @@ namespace STOREFLOWER
         private void StatusFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_allOrders == null || _ordersView == null) return;
-
             var selectedFilter = (StatusFilterComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
-
-            // Очищаем текущий фильтр
             _ordersView.Filter = null;
-
             if (selectedFilter == "Все")
             {
-                _ordersView.Filter = null; // Показываем все заказы
+                _ordersView.Filter = null; 
             }
             else if (selectedFilter == "Оплачены")
             {
@@ -132,10 +125,7 @@ namespace STOREFLOWER
 
         private void OrdersGrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
-            // Сохраняем текущий фильтр перед сортировкой
             var currentFilter = _ordersView.Filter;
-
-            // Применяем фильтр после сортировки
             _ordersView.Filter = currentFilter;
         }
 
@@ -166,6 +156,8 @@ namespace STOREFLOWER
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
             this.Close();
         }
 

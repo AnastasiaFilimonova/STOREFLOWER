@@ -11,8 +11,6 @@ namespace STOREFLOWER.Models
     {
         public int StoreID { get; set; }
         public string Address { get; set; }
-
-        // Навигационное свойство для связи с Admins (один ко многим)
         public ICollection<Admin> Admins { get; set; }
         public ICollection<Florist> Florists { get; set; }
         public ICollection<Order> Orders { get; set; }

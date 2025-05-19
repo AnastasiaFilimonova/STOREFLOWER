@@ -25,18 +25,13 @@ namespace STOREFLOWER
         private readonly Admin _currentAdmin;
         private List<CreateOrderItemViewModel> _orderItems = new List<CreateOrderItemViewModel>();
         private List<Product> _availableProducts;
-
         public CreateOrderWindow(Admin admin)
         {
             InitializeComponent();
             _context = new StoreFlowerContext();
             _currentAdmin = admin;
-
-            // Загрузка магазинов и продуктов
             LoadStores();
             LoadProducts();
-
-            // Установка начального магазина
             StoreAddressComboBox.SelectedValue = _currentAdmin.StoreID;
         }
 
@@ -100,7 +95,6 @@ namespace STOREFLOWER
         {
             try
             {
-                // Проверка заполнения обязательных полей
                 if (string.IsNullOrWhiteSpace(CustomerNameTextBox.Text) ||
                     string.IsNullOrWhiteSpace(CustomerPhoneTextBox.Text) ||
                     string.IsNullOrWhiteSpace(DeliveryAddressTextBox.Text) ||
@@ -110,23 +104,17 @@ namespace STOREFLOWER
                     MessageBox.Show("Пожалуйста, заполните все поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
-                // Проверка ФИО
                 var fullName = CustomerNameTextBox.Text.Trim().Split(' ');
                 if (fullName.Length < 3)
                 {
                     MessageBox.Show("Введите ФИО полностью (Фамилия Имя Отчество)", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
-                // Проверка состава заказа
                 if (!_orderItems.Any())
                 {
                     MessageBox.Show("Добавьте хотя бы один продукт в состав заказа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
-                // Проверка корректности количества
                 foreach (var item in _orderItems)
                 {
                     if (item.Quantity <= 0)
@@ -134,8 +122,6 @@ namespace STOREFLOWER
                         MessageBox.Show("Количество каждого продукта должно быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
-
-                    // Проверка наличия продукта на складе
                     var product = _availableProducts.FirstOrDefault(p => p.ProductID == item.ProductID);
                     if (product != null && product.Stock < item.Quantity)
                     {
@@ -143,8 +129,6 @@ namespace STOREFLOWER
                         return;
                     }
                 }
-
-                // Создание заказа
                 var newOrder = new Order
                 {
                     OrderDate = DateTime.Now,
@@ -152,7 +136,7 @@ namespace STOREFLOWER
                     ClientPhoneNumber = CustomerPhoneTextBox.Text.Trim(),
                     StoreID = (int)StoreAddressComboBox.SelectedValue,
                     DeliveryDateTime = DeliveryDatePicker.SelectedDate.Value,
-                    StatusID = 1, // Новый заказ
+                    StatusID = 1, 
                     FloristID = null,
                     DelivererID = null,
                     ClientLastName = fullName[0],
@@ -165,11 +149,8 @@ namespace STOREFLOWER
                         Price = oi.Price
                     }).ToList()
                 };
-
                 _context.Orders.Add(newOrder);
                 _context.SaveChanges();
-
-                // Обновляем склад
                 foreach (var item in _orderItems)
                 {
                     var product = _context.Products.FirstOrDefault(p => p.ProductID == item.ProductID);

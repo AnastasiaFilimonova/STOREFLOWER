@@ -5,13 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:STOREFLOWER"
         mc:Ignorable="d"
-        Title="DeliveryDetailsWindow" Height="300" Width="400">
+        Title="DeliveryDetailsWindow" Height="350" Width="500" MinHeight="350" MinWidth="500">
     <Grid Margin="20">
         <StackPanel>
-            <TextBlock Text="Адрес клиента:" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-            <TextBlock x:Name="ClientAddressText" FontSize="14" TextWrapping="Wrap" />
-            <TextBlock Text="Адрес магазина:" FontWeight="Bold" FontSize="16"/>
-            <TextBlock x:Name="ShopAddressText" FontSize="14" TextWrapping="Wrap" />
+            <TextBlock Text="Детали заказа" FontWeight="Bold" FontSize="18" Margin="0,0,0,10"/>
+            <TextBlock Text="Адрес клиента:" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
+            <TextBlock x:Name="ClientAddressText" FontSize="14" TextWrapping="Wrap" Margin="0,0,0,10"/>
+            <TextBlock Text="Адрес магазина:" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
+            <TextBlock x:Name="ShopAddressText" FontSize="14" TextWrapping="Wrap" Margin="0,0,0,10"/>
+            <TextBlock Text="Статус:" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
+            <ComboBox x:Name="StatusComboBox" FontSize="14" Margin="0,0,0,10" SelectionChanged="StatusComboBox_SelectionChanged">
+                <ComboBoxItem Content="Готовы к доставке" Tag="3"/>
+                <ComboBoxItem Content="Доставлены" Tag="5"/>
+                <ComboBoxItem Content="Возврат в магазин" Tag="6"/>
+            </ComboBox>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="SaveButton" Content="Сохранить" FontSize="14" Padding="10,2" Click="SaveButton_Click" Margin="0,0,10,0" Height="30" Width="90"/>
+                <Button x:Name="CancelButton" Content="Отмена" FontSize="14" Padding="10,2" Background="{StaticResource AccentBrush}" Click="CancelButton_Click" Height="30" Width="90"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

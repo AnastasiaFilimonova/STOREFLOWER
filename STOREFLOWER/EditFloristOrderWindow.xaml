@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:STOREFLOWER"
         mc:Ignorable="d"
-        Title="EditFloristOrderWindow" Height="193" Width="440"
-        WindowStartupLocation="CenterOwner">
+        Title="EditFloristOrderWindow" Height="193" Width="440" MinHeight="193" MinWidth="440" WindowStartupLocation="CenterOwner">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

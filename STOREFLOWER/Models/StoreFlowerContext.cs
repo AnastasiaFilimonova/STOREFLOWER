@@ -10,7 +10,7 @@ namespace STOREFLOWER.Models
 {
     public class StoreFlowerContext : DbContext
     {
-        public DbSet<Admin> Admins { get; set; } // Добавь это, если его нет
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Store> Stores { get; set; }
@@ -30,37 +30,31 @@ namespace STOREFLOWER.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Связь Orders и OrderStatuses
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Status)
                 .WithMany(s => s.Orders)
                 .HasForeignKey(o => o.StatusID);
 
-            // Связь Orders и Stores
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Store)
                 .WithMany(s => s.Orders)
                 .HasForeignKey(o => o.StoreID);
 
-            // Связь Orders и Florists
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Florist)
                 .WithMany(f => f.Orders)
                 .HasForeignKey(o => o.FloristID);
 
-            // Связь Orders и Deliverers
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Deliverer)
                 .WithMany(d => d.Orders)
                 .HasForeignKey(o => o.DelivererID);
 
-            // Связь Products и Stores
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Store)
                 .WithMany(s => s.Products)
                 .HasForeignKey(p => p.StoreID);
 
-            // Связь Florists и Stores
             modelBuilder.Entity<Florist>()
                 .HasOne(f => f.Store)
                 .WithMany(s => s.Florists)

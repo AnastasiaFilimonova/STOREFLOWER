@@ -18,7 +18,6 @@ namespace STOREFLOWER
     public partial class MainWindow : Window
     {
         private readonly StoreFlowerContext _context;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -43,15 +42,12 @@ namespace STOREFLOWER
                     MessageBox.Show("Пожалуйста, заполните все поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
-                // Проверка учетных данных для каждой роли
                 var admin = _context.Admins.FirstOrDefault(a => a.Login == login && a.Password == password);
                 var florist = _context.Florists.FirstOrDefault(f => f.Login == login && f.Password == password);
                 var deliverer = _context.Deliverers.FirstOrDefault(d => d.Login == login && d.Password == password);
 
                 if (admin != null)
                 {
-                    // Передаем объект admin в AdminWindow
                     AdminWindow adminWindow = new AdminWindow(admin);
                     adminWindow.Show();
                     this.Close();
@@ -64,7 +60,7 @@ namespace STOREFLOWER
                 }
                 else if (deliverer != null)
                 {
-                    DeliverWindow deliverWindow = new DeliverWindow();
+                    DeliverWindow deliverWindow = new DeliverWindow(deliverer);
                     deliverWindow.Show();
                     this.Close();
                 }

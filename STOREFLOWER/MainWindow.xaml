@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:STOREFLOWER"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="900" Background="{StaticResource BackgroundBrush}">
-
+        Title="MainWindow" Height="700" Width="920" MinHeight="700" MinWidth="920" Background="{StaticResource BackgroundBrush}">
     <Grid Height="700" Width="900">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="350">
             <TextBlock Text="Вход в систему" FontSize="26" FontWeight="Bold" Foreground="#5C5470" TextAlignment="Center" Margin="0,0,0,30"/>

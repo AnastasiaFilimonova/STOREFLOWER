@@ -14,8 +14,6 @@ namespace STOREFLOWER.Models
         public int ProductID { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
-
-        // Навигационные свойства для связей
         public Order Order { get; set; }
         public Product Product { get; set; }
     }

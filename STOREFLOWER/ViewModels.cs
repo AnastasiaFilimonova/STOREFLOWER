@@ -17,24 +17,32 @@ namespace STOREFLOWER
         }
 
         private string _orderNumber;
+        private DateTime _creationDateTime;
         private string _creationDate;
         private string _deliveryAddress;
-        private System.DateTime _deliveryDateTime;
+        private DateTime? _deliveryDateTime;
         private string _status;
         private int _statusID;
         private string _customer;
         private string _clientPhone;
         private string _floristDisplay;
         private string _delivererDisplay;
-        private int _floristId;
+        private int? _floristId;
         private List<FloristViewModel> _availableFlorists;
         private List<OrderStatusViewModel> _availableStatuses;
         private List<OrderItemViewModel> _orderItems;
+        private int? _storeID;
 
         public string OrderNumber
         {
             get => _orderNumber;
             set { _orderNumber = value; OnPropertyChanged(nameof(OrderNumber)); }
+        }
+
+        public DateTime CreationDateTime
+        {
+            get => _creationDateTime;
+            set { _creationDateTime = value; OnPropertyChanged(nameof(CreationDateTime)); }
         }
 
         public string CreationDate
@@ -49,7 +57,7 @@ namespace STOREFLOWER
             set { _deliveryAddress = value; OnPropertyChanged(nameof(DeliveryAddress)); }
         }
 
-        public System.DateTime DeliveryDateTime
+        public DateTime? DeliveryDateTime
         {
             get => _deliveryDateTime;
             set { _deliveryDateTime = value; OnPropertyChanged(nameof(DeliveryDateTime)); }
@@ -91,7 +99,7 @@ namespace STOREFLOWER
             set { _delivererDisplay = value; OnPropertyChanged(nameof(DelivererDisplay)); }
         }
 
-        public int FloristId
+        public int? FloristId
         {
             get => _floristId;
             set { _floristId = value; OnPropertyChanged(nameof(FloristId)); }
@@ -113,6 +121,12 @@ namespace STOREFLOWER
         {
             get => _orderItems;
             set { _orderItems = value; OnPropertyChanged(nameof(OrderItems)); }
+        }
+
+        public int? StoreID
+        {
+            get => _storeID;
+            set { _storeID = value; OnPropertyChanged(nameof(StoreID)); }
         }
 
         public decimal TotalOrderPrice => OrderItems?.Sum(oi => oi.TotalPrice) ?? 0;

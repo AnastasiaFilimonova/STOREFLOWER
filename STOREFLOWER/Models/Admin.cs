@@ -16,8 +16,6 @@ namespace STOREFLOWER.Models
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string Patronymic { get; set; }
-
-        // Навигационное свойство для связи с Stores
         public Store Store { get; set; }
     }
 }

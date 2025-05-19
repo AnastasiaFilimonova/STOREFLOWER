@@ -43,7 +43,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Button Content="Добавить продукт" Width="150" Height="30" FontSize="16" Click="AddOrderItemButton_Click" Margin="0,0,0,10"/>
+                <Button Content="Добавить продукт" Width="170" Height="30" FontSize="16" Click="AddOrderItemButton_Click" Margin="0,0,0,10"/>
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">

@@ -13,15 +13,13 @@ namespace STOREFLOWER.Models
         public string DeliveryAddress { get; set; }
         public string ClientPhoneNumber { get; set; }
         public int StoreID { get; set; }
-        public DateTime DeliveryDateTime { get; set; }
+        public DateTime? DeliveryDateTime { get; set; }
         public int StatusID { get; set; }
         public int? FloristID { get; set; }
         public int? DelivererID { get; set; }
         public string ClientLastName { get; set; }
         public string ClientFirstName { get; set; }
         public string ClientPatronymic { get; set; }
-
-        // Навигационные свойства для связей
         public Store Store { get; set; }
         public OrderStatus Status { get; set; }
         public Florist Florist { get; set; }

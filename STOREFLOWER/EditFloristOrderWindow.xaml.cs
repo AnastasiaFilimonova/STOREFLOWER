@@ -24,7 +24,6 @@ namespace STOREFLOWER
         private readonly OrderViewModel _order;
         private readonly List<OrderViewModel> _allOrders;
         private readonly FloristWindow _floristWindow;
-
         public EditFloristOrderWindow(OrderViewModel order, StoreFlowerContext context, List<OrderViewModel> allOrders, FloristWindow floristWindow)
         {
             InitializeComponent();

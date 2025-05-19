@@ -25,7 +25,6 @@ namespace STOREFLOWER
         private readonly StoreFlowerContext _context;
         private readonly Admin _currentAdmin;
         private List<OrderViewModel> _allOrders;
-
         public AdminWindow(Admin admin)
         {
             InitializeComponent();
@@ -35,14 +34,12 @@ namespace STOREFLOWER
             LoadFlorists();
             LoadOrders();
         }
-
         private void LoadAdminData()
         {
             AdminNameTextBlock.Text = $"{_currentAdmin.LastName} {_currentAdmin.FirstName} {_currentAdmin.Patronymic}";
             var store = _context.Stores.FirstOrDefault(s => s.StoreID == _currentAdmin.StoreID);
             StoreAddressTextBlock.Text = store?.Address ?? "Магазин не найден";
         }
-
         private void LoadFlorists()
         {
             var florists = _context.Florists
@@ -59,12 +56,10 @@ namespace STOREFLOWER
 
             FloristListBox.ItemsSource = florists;
         }
-
         private string GetStoreAddress(int storeId)
         {
             return _context.Stores.FirstOrDefault(s => s.StoreID == storeId)?.Address ?? "Не указан";
         }
-
         private void LoadOrders()
         {
             var orders = _context.Orders
@@ -191,6 +186,8 @@ namespace STOREFLOWER
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
             this.Close();
         }
 

@@ -13,8 +13,6 @@ namespace STOREFLOWER.Models
         public string ProductName { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-
-        // Навигационное свойство для связи с Stores
         public Store Store { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; }
     }

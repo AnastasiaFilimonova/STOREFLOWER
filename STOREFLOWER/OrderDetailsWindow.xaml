@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:STOREFLOWER"
         mc:Ignorable="d"
-        Title="OrderDetailsWindow" Height="600" Width="500" Background="{StaticResource BackgroundBrush}">
+        Title="OrderDetailsWindow" Height="600" Width="500" MinHeight="600" MinWidth="500" Background="{StaticResource BackgroundBrush}">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
